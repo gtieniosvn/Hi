@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>🔒 SYSTEM LOCKED</title>
+    
+    <!-- Telegram WebApp -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <style>
+        :root {
+            --bg: #000;
+            --primary: #00ff88;
+            --danger: #ff4444;
+            --warning: #ffaa00;
+            --dark: #0a0a0a;
+            --glass: rgba(0, 0, 0, 0.85);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        html, body {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            overscroll-behavior: none;
+            -webkit-overflow-scrolling: none;
+            touch-action: manipulation;
+            position: fixed;
+            top: 0;
+            left: 0;
+        }
+
+        /* Ảnh nền */
+        .bg-image {
+            position: fixed;
+            top: -10px;
+            left: -10px;
+            width: calc(100% + 20px);
+            height: calc(100% + 20px);
+            background: url('https://cdn.phototourl.com/free/2026-05-23-a5c58b31-ed77-45aa-99b7-0d103589c419.jpg') center/cover no-repeat;
+            filter: brightness(0.25) blur(2px);
+            z-index: 0;
+        }
+
+        /* Hiệu ứng hạt */
+        .particles {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Container chính */
+        .main-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2;
+            padding: 20px;
+        }
+
+        .lock-box {
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 255, 136, 0.2);
+            border-radius: 24px;
+            padding: 35px 25px;
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+            box-shadow: 
+                0 0 60px rgba(0, 255, 136, 0.1),
+                0 0 120px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .icon-lock {
+            font-size: 70px;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+            filter: drop-shadow(0 0 20px rgba(0, 255, 136, 0.5));
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+        }
+
+        .title {
+            color: #fff;
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: var(--warning);
+            font-size: 12px;
+            margin-bottom: 20px;
+            letter-spacing: 0.5px;
+        }
+
+        .status-msg {
+            color: var(--danger);
+            font-size: 13px;
+            min-height: 35px;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 45px 14px 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 3px;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .input-group input:disabled {
+            border-color: #333;
+            color: #555;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .input-icon {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .btn-unlock {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            border: none;
+            border-radius: 12px;
+            color: #000;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-unlock:hover {
+            background: #00dd77;
+            box-shadow: 0 0 40px rgba(0, 255, 136, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .btn-unlock:active {
+            transform: scale(0.95);
+            background: #00cc6a;
+        }
+
+        .btn-unlock:disabled {
+            background: #222;
+            color: #555;
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none;
+        }
+
+        .btn-unlock::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            transition: 0.5s;
+        }
+
+        .btn-unlock:not(:disabled):hover::after {
+            left: 100%;
+        }
+
+        /* Thanh lần thử */
+        .attempt-bar {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .attempt-bar .dot {
+            width: 35px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            transition: all 0.3s;
+        }
+
+        .attempt-bar .dot.fail {
+            background: var(--danger);
+            box-shadow: 0 0 10px rgba(255, 68, 68, 0.6);
+            animation: shake 0.3s ease;
+        }
+
+        .attempt-bar .dot.warn {
+            background: var(--warning);
+            box-shadow: 0 0 10px rgba(255, 170, 0, 0.6);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Thông báo khóa */
+        .lockdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 0, 0.05);
+            z-index: 3;
+            pointer-events: none;
+            display: none;
+            animation: lockdownFlash 0.5s ease;
+        }
+
+        .lockdown-overlay.active {
+            display: block;
+        }
+
+        @keyframes lockdownFlash {
+            0% { background: rgba(255, 0, 0, 0.3); }
+            100% { background: rgba(255, 0, 0, 0.05); }
+        }
+
+        /* Responsive */
+        @media (max-width: 380px) {
+            .lock-box {
+                padding: 25px 18px;
+            }
+            .icon-lock {
+                font-size: 55px;
+            }
+            .title {
+                font-size: 20px;
+            }
+        }
+
+        @media (min-width: 768px) {
+            .lock-box {
+                max-width: 420px;
+                padding: 45px 35px;
+            }
+            .icon-lock {
+                font-size: 90px;
+            }
+            .title {
+                font-size: 28px;
+            }
+            .btn-unlock {
+                font-size: 18px;
+                padding: 16px;
+            }
+            .input-group input {
+                font-size: 18px;
+                padding: 16px 50px 16px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ảnh nền -->
+    <div class="bg-image"></div>
+
+    <!-- Hiệu ứng hạt -->
+    <canvas class="particles" id="particles"></canvas>
+
+    <!-- Overlay khóa -->
+    <div class="lockdown-overlay" id="lockdownOverlay"></div>
+
+    <!-- Giao diện chính -->
+    <div class="main-container">
+        <div class="lock-box">
+            <div class="icon-lock">🔒</div>
+            <div class="title">HỆ THỐNG ĐÃ KHÓA</div>
+            <div class="subtitle">⚠️ MỌI CÁCH THOÁT ĐÃ BỊ VÔ HIỆU</div>
+            
+            <div class="status-msg" id="statusMsg"></div>
+            
+            <div class="input-group">
+                <input 
+                    type="password" 
+                    id="pwdInput" 
+                    placeholder="🔑 Nhập mật khẩu..." 
+                    maxlength="30"
+                    autocomplete="off"
+                    autocorrect="off"
+                    autocapitalize="off"
+                    spellcheck="false"
+                >
+                <span class="input-icon">🔐</span>
+            </div>
+            
+            <button class="btn-unlock" id="btnUnlock" onclick="handleUnlock()">
+                🔓 MỞ KHÓA HỆ THỐNG
+            </button>
+            
+            <div class="attempt-bar" id="attemptBar">
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+                <span class="dot"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============ CONFIG ============
+        const CONFIG = {
+            password: 'admin123',
+            maxAttempts: 5,
+            lockTime: 30,
+            background: 'https://cdn.phototourl.com/free/2026-05-23-a5c58b31-ed77-45aa-99b7-0d103589c419.jpg'
+        };
+
+        // ============ STATE ============
+        let attempts = 0;
+        let lockedUntil = 0;
+        let securityLevel = 0;
+
+        // ============ DOM ELEMENTS ============
+        const statusMsg = document.getElementById('statusMsg');
+        const pwdInput = document.getElementById('pwdInput');
+        const btnUnlock = document.getElementById('btnUnlock');
+        const dots = document.querySelectorAll('.attempt-bar .dot');
+        const lockdownOverlay = document.getElementById('lockdownOverlay');
+
+        // ============ TELEGRAM WEBAPP ============
+        let tg = null;
+        try {
+            if (window.Telegram && window.Telegram.WebApp) {
+                tg = window.Telegram.WebApp;
+                tg.expand();
+                tg.disableVerticalSwipes();
+                tg.BackButton.hide();
+                tg.MainButton.hide();
+                tg.setHeaderColor('#000000');
+                tg.setBackgroundColor('#000000');
+                tg.SettingsButton.hide();
+                
+                // Chặn close từ Telegram
+                tg.onEvent('viewportChanged', () => tg.expand());
+            }
+        } catch(e) {}
+
+        // ============ CHẶN THOÁT PC ============
+        // Chặn tất cả phím tắt
+        document.addEventListener('keydown', function(e) {
+            const blockedKeys = [
+                'Escape', 'F1', 'F4', 'F5', 'F11', 'F12',
+                'Tab', 'Alt', 'Control', 'Meta', 'ContextMenu'
+            ];
+            
+            const blockedCombos = [
+                e.altKey && e.key === 'F4',
+                e.ctrlKey && e.key === 'w',
+                e.ctrlKey && e.key === 'W',
+                e.ctrlKey && e.key === 't',
+                e.ctrlKey && e.key === 'T',
+                e.ctrlKey && e.key === 'n',
+                e.ctrlKey && e.key === 'N',
+                e.ctrlKey && e.shiftKey && e.key === 'T',
+                e.ctrlKey && e.shiftKey && e.key === 'N',
+                e.ctrlKey && e.key === 'Tab',
+                e.altKey && e.key === 'Tab',
+                e.metaKey && e.key === 'w',
+                e.metaKey && e.key === 'q',
+                e.ctrlKey && e.key === 'F4',
+                e.ctrlKey && e.shiftKey && e.key === 'W',
+            ];
+
+            if (blockedKeys.includes(e.key) || blockedCombos.some(c => c)) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                showTempStatus('⚠️ Tổ hợp phím bị chặn!', 'warning');
+                return false;
+            }
+
+            // Chặn Ctrl+R, F5 (refresh)
+            if ((e.ctrlKey && e.key === 'r') || e.key === 'F5') {
+                e.preventDefault();
+                showTempStatus('⚠️ Không thể tải lại trang!', 'warning');
+                return false;
+            }
+        }, true);
+
+        // Chặn chuột phải
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            showTempStatus('⚠️ Chuột phải bị vô hiệu!', 'warning');
+            return false;
+        });
+
+        // Chặn kéo thả
+        document.addEventListener('dragstart', e => e.preventDefault());
+        document.addEventListener('drop', e => e.preventDefault());
+
+        // ============ CHẶN THOÁT MOBILE ============
+        // Chặn kéo xuống refresh
+        document.addEventListener('touchmove', function(e) {
+            if (e.target === document.body || e.target === document.documentElement) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Chặn gesture back/forward
+        document.addEventListener('gesturestart', e => e.preventDefault());
+        document.addEventListener('gesturechange', e => e.preventDefault());
+        document.addEventListener('gestureend', e => e.preventDefault());
+
+        // Chặn double tap zoom
+        document.addEventListener('dblclick', e => e.preventDefault());
+
+        // ============ CHẶN THOÁT BROWSER ============
+        // Chặn back/forward button
+        history.pushState(null, null, location.href);
+        history.pushState(null, null, location.href);
+        history.pushState(null, null, location.href);
+
+        window.addEventListener('popstate', function() {
+            history.pushState(null, null, location.href);
+            history.pushState(null, null, location.href);
+            securityLevel++;
+            
+            if (securityLevel > 3) {
+                activateFullLockdown();
+            }
+            showTempStatus('⚠️ Không thể quay lại!', 'warning');
+        });
+
+        // Chặn beforeunload
+        window.addEventListener('beforeunload', function(e) {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+
+        // Chặn visibility change (khi user chuyển tab)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden) {
+                securityLevel++;
+                if (securityLevel > 5) {
+                    activateFullLockdown();
+                }
+            }
+        });
+
+        // ============ FULL LOCKDOWN ============
+        function activateFullLockdown() {
+            lockdownOverlay.classList.add('active');
+            setTimeout(() => lockdownOverlay.classList.remove('active'), 1000);
+            
+            attempts = CONFIG.maxAttempts;
+            updateAttemptBar();
+            
+            if (lockedUntil === 0) {
+                lockedUntil = Date.now() / 1000 + CONFIG.lockTime;
+            }
+            
+            showStatus('🚨 CẢNH BÁO! HỆ THỐNG KHÓA CỨNG!', 'danger');
+        }
+
+        // ============ HIỂN THỊ ============
+        function showStatus(msg, type) {
+            statusMsg.textContent = msg;
+            statusMsg.style.color = type === 'danger' ? '#ff4444' : 
+                                    type === 'warning' ? '#ffaa00' : '#00ff88';
+        }
+
+        function showTempStatus(msg, type) {
+            showStatus(msg, type);
+            setTimeout(() => {
+                if (statusMsg.textContent === msg) {
+                    statusMsg.textContent = '';
+                }
+            }, 2000);
+        }
+
+        function updateAttemptBar() {
+            dots.forEach((dot, i) => {
+                dot.classList.remove('fail', 'warn');
+                if (i < attempts) {
+                    if (attempts >= CONFIG.maxAttempts - 1) {
+                        dot.classList.add('fail');
+                    } else if (attempts >= CONFIG.maxAttempts - 2) {
+                        dot.classList.add('warn');
+                    } else {
+                        dot.classList.add('fail');
+                    }
+                }
+            });
+        }
+
+        // ============ UNLOCK ============
+        function handleUnlock() {
+            const now = Date.now() / 1000;
+            
+            // Đang bị khóa
+            if (now < lockedUntil) {
+                const remaining = Math.ceil(lockedUntil - now);
+                showStatus(`⏰ Vui lòng đợi ${remaining} giây...`, 'warning');
+                shakeElement(document.querySelector('.lock-box'));
+                return;
+            }
+
+            const password = pwdInput.value.trim();
+            pwdInput.value = '';
+            pwdInput.focus();
+
+            if (password === CONFIG.password) {
+                // ĐÚNG MẬT KHẨU
+                showStatus('✅ MẬT KHẨU CHÍNH XÁC! ĐANG MỞ KHÓA...', 'success');
+                pwdInput.disabled = true;
+                btnUnlock.disabled = true;
+                
+                // Hiệu ứng thành công
+                document.querySelector('.icon-lock').textContent = '🔓';
+                document.querySelector('.icon-lock').style.animation = 'none';
+                document.querySelector('.icon-lock').style.color = '#00ff88';
+                
+                setTimeout(() => {
+                    if (tg) {
+                        tg.close();
+                    }
+                    // Fallback
+                    window.location.href = 'about:blank';
+                }, 2000);
+
+            } else if (password === '') {
+                return;
+                
+            } else {
+                // SAI MẬT KHẨU
+                attempts++;
+                updateAttemptBar();
+                
+                if (attempts >= CONFIG.maxAttempts) {
+                    // KHÓA
+                    lockedUntil = now + CONFIG.lockTime;
+                    attempts = 0;
+                    updateAttemptBar();
+                    activateFullLockdown();
+                    showStatus(`🔒 KHÓA ${CONFIG.lockTime} GIÂY! KHÔNG THỂ THOÁT!`, 'danger');
+                } else {
+                    const remaining = CONFIG.maxAttempts - attempts;
+                    showStatus(`❌ SAI MẬT KHẨU! Còn ${remaining} lần thử`, 'danger');
+                    shakeElement(document.querySelector('.lock-box'));
+                }
+            }
+        }
+
+        // ============ HIỆU ỨNG ============
+        function shakeElement(el) {
+            el.style.animation = 'none';
+            el.offsetHeight;
+            el.style.animation = 'shake 0.4s ease';
+            setTimeout(() => el.style.animation = '', 400);
+        }
+
+        // ============ PARTICLES ============
+        function initParticles() {
+            const canvas = document.getElementById('particles');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speedX: (Math.random() - 0.5) * 0.5,
+                    speedY: (Math.random() - 0.5) * 0.5,
+                    opacity: Math.random() * 0.3 + 0.1
+                });
+            }
+            
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    
+                    if (p.x < 0) p.x = canvas.width;
+                    if (p.x > canvas.width) p.x = 0;
+                    if (p.y < 0) p.y = canvas.height;
+                    if (p.y > canvas.height) p.y = 0;
+                    
+                    ctx.fillStyle = `rgba(0, 255, 136, ${p.opacity})`;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+                
+                requestAnimationFrame(animate);
+            }
+            
+            animate();
+        }
+
+        // ============ INIT ============
+        function init() {
+            pwdInput.focus();
+            
+            // Tự động focus lại nếu mất
+            document.addEventListener('click', () => pwdInput.focus());
+            
+            // Enter để submit
+            pwdInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleUnlock();
+            });
+            
+            // Cập nhật trạng thái mỗi giây
+            setInterval(() => {
+                const now = Date.now() / 1000;
+                if (now < lockedUntil) {
+                    const remaining = Math.ceil(lockedUntil - now);
+                    showStatus(`⏰ Đợi ${remaining}s | KHÔNG THỂ THOÁT!`, 'warning');
+                    pwdInput.disabled = true;
+                    btnUnlock.disabled = true;
+                } else if (pwdInput.disabled && now >= lockedUntil) {
+                    pwdInput.disabled = false;
+                    btnUnlock.disabled = false;
+                    statusMsg.textContent = '';
+                    attempts = 0;
+                    updateAttemptBar();
+                    securityLevel = 0;
+                    pwdInput.focus();
+                }
+            }, 1000);
+            
+            // Particles
+            initParticles();
+            
+            // Chặn print screen (1 phần)
+            window.addEventListener('blur', () => {
+                securityLevel += 2;
+                if (securityLevel > 4) activateFullLockdown();
+            });
+            
+            // Chặn tìm kiếm trong trang
+            window.addEventListener('keydown', (e) => {
+                if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        }
+
+        // ============ START ============
+        init();
+        
+        // Thông báo khi load
+        console.clear();
+        console.log('%c⚠️ CẢNH BÁO! %cKhông thể đóng trang này!', 
+                    'color: red; font-size: 20px;', 'color: white;');
+        console.log('%cNhập đúng mật khẩu để thoát!', 'color: yellow;');
+    </script>
+</body>
+</html>
